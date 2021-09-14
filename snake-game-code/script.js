@@ -1,64 +1,71 @@
-//cria variável canvas, usando getElementById para ligar ao ID "snake" do HTML
 let canvas = document.getElementById("snake");
-
-// renderiza o jogo(canvas), passando a tratar o arquivo como 2d (abaixo)
 let context = canvas.getContext("2d") 
-
-// criação e atribuição dos elementos do game
-let box = 32;   //32 px === 32 square (tamanho da caixa)
-let snake = []; // array snake irá receber valores durante o jogo
-snake[0] = {    // conteúdo snake(array)
-    x: 8 * box, // eixo x (posição horizontal?) * 32px (tamanho total da box)
-    y: 8 * box  // eixo y (posição vertical?) * 32px (tamanho total da box)
+let box = 32;   
+let snake = []; 
+snake[0] = {    
+    x: 8 * box, 
+    y: 8 * box  
 }
-// entrada do jogador
 let direction = "right";
-
-
-// função que inicial o canvas
-function criarBG() {
-// fillStyle trabalha com o "estilo do canvas" (canvas/contexto)
-    context.fillStyle = "black"; 
-// vai desenhar o retângulo, onde vai acontecer o jogo(4 parametros x, y, widght e height)
-    context.fillRect(0, 0, 16 * box, 16 * box);  //0, 0, 16, 16px (px === square)
+let food = {
+    x: Math.floor(Math.random() * 15 + 1) * box,
+    y: Math.floor(Math.random() * 15 + 1) * box
 }
-// como a snake será um array, será usa FOR para construir o laço de repetição
-// FOR poderá percorrer todo o conteúdo do array, podenda ainda, incrementar 1px por vez
+
+function criarBG() {
+    context.fillStyle = "black"; 
+    context.fillRect(0, 0, 16 * box, 16 * box);  
+}
+
 function criarSnake() {
-//contexto relativo(for)
-    for(i=0; i <snake.length; i++) {
-// passando contexto novamente, mas agora ligado à snake, por tanto não precisa setar novamente 
-        context.fillStyle = "gray";
-// tamanho da snake; x e y passados dentro da let box
+    for(i=0; i < snake.length; i++) {
+        context.fillStyle = "grey";
         context.fillRect(snake[i].x, snake[i].y, box, box);
     }
-    
 }
-// todas as demais funções
+
+function drawFood(){
+    context.fillStyle = "red";
+    context.fillRect(food.x, food.y, box, box);
+}
+
+document.addEventListener('keydown', update);
+
+function update (event){
+    if(event.keyCode == 37 && direction != "right") direction = "left";
+    if(event.keyCode == 38 && direction != "down") direction = "up";
+    if(event.keyCode == 39 && direction != "left") direction = "right";
+    if(event.keyCode == 40 && direction != "up") direction = "down";
+}
+
 function iniciarGame(){
+    if(snake[0].x > 15 * box && direction == "right") snake[0].x = 0;
+    if(snake[0].x < 0 && direction == "left") snake[0].x = 16 * box;
+    if(snake[0].y > 15 * box && direction == "down") snake[0].y = 0;
+    if(snake[0].y < 0 && direction == "up") snake[0].y = 16 * box;
+   
     criarBG();
     criarSnake();
+    drawFood();
 
-    let snakeX = snake[0].x; // comando para posições iniciais da array
+    let snakeX = snake[0].x; 
     let snakeY = snake[0].y;
 
-// add ou subtrai de acordo com plano cartesiano => +
     if(direction == "right") snakeX += box;
     if(direction == "left") snakeX -= box;
-    if(direction == "up") snakeY += box;
-    if(direction == "down") snakeY -= box;
+    if(direction == "up") snakeY -= box;
+    if(direction == "down") snakeY += box;
 
-// add função pop para retirar o último elemento do array
     snake.pop();
 
-// add criar nova cabeça com elemento unshift, acrescentando um elemento à frente
     let newHead = {
         x: snakeX,
-        Y: snakeY
+        y: snakeY
     }
 
     snake.unshift(newHead);
 
 }
-// renovar a cada 100 milisegundos
+
 let game = setInterval(iniciarGame, 100);
+
